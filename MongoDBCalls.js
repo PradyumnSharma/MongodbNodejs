@@ -13,7 +13,8 @@ function dbConnect() {
     // callback = findWithVariousOptions;
     // callback = deleteJennyHJones;
     // callback = deleteAllMen;
-    callback = updateNancyKarin;
+    // callback = updateNancyKarin;
+    callback = updateMany;
     // callback = dropCollection;
 
 
@@ -185,7 +186,19 @@ function updateNancyKarin (err, db) {
     var newValues = {$set: {passport: 'H123321', yearOfBirth: 1950}};
     dbo.collection ('persons').updateOne (query, newValues, function (err, result) {
         if (err) throw err;
-        console.log (result.result.nModified);
+        console.log (result.result.n);
+        db.close();
+    });
+};
+
+function updateMany (err, db) {
+    if (err) throw err;
+    var dbo = db.db ('training');
+    var query = {gender: 'M'};
+    var newValues = {$set: {isMale: true}};
+    dbo.collection ('persons').updateMany (query, newValues, function (err, result) {
+        if (err) throw err;
+        console.log (result.result.n);
         db.close();
     });
 };
