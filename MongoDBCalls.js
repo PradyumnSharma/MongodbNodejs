@@ -9,10 +9,11 @@ function dbConnect() {
     // callback = findAll2;
     // callback = findWithFilter;
     // callback = findWithFilterAndProjection;
-    callback = findAllWithProjectionAndSort;
+    // callback = findAllWithProjectionAndSort;
     // callback = findWithVariousOptions;
     // callback = deleteJennyHJones;
     // callback = deleteAllMen;
+    callback = updateNancyKarin;
     // callback = dropCollection;
 
 
@@ -120,12 +121,20 @@ function findAllWithProjectionAndSort(err, db) {
     //     db.close();
     // });
     // Alternatively...
-    dbo.collection('persons').find({}, { projection: projection, sort: byLastNameAndFirstName, skip: 3, limit: 3 }).
+    // dbo.collection('persons').find({}, { projection: projection, sort: byLastNameAndFirstName, skip: 3, limit: 3 }).
+    // toArray(function (err, result) {
+    //     if (err) throw err;
+    //     console.log(result);
+    //     db.close();
+    // });
+    // Alternatively...
+    dbo.collection('persons').find({}, { projection: projection}).sort (byLastNameAndFirstName).skip(3).limit(3).
     toArray(function (err, result) {
         if (err) throw err;
         console.log(result);
         db.close();
     });
+
 };
 
 function findWithVariousOptions (err, db) {
@@ -164,7 +173,19 @@ function deleteAllMen(err, db) {
     var deleteMen = { gender: 'M' };
     dbo.collection('persons').deleteMany(deleteMen, function (err, result) {
         if (err) throw err;
-        console.log(result.result.n);
+        console.log(result.deletedCount);
+        db.close();
+    });
+};
+
+function updateNancyKarin (err, db) {
+    if (err) throw err;
+    var dbo = db.db ('training');
+    var query = {'name.first': 'Nancy', 'name.last': 'Karin'};
+    var newValues = {$set: {passport: 'H123321', yearOfBirth: 1950}};
+    dbo.collection ('persons').updateOne (query, newValues, function (err, result) {
+        if (err) throw err;
+        console.log (result.result.nModified);
         db.close();
     });
 };
