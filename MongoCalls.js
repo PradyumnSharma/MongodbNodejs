@@ -23,7 +23,8 @@ async function execute() {
     // countDocuments(client);
     // distinctValues(client);
     // aggregation(client);
-    dropCollection(client);
+    // dropCollection(client);
+    transaction (client);
 };
 
 async function findOne(client) {
@@ -219,9 +220,25 @@ async function aggregation(client) {
 
 async function dropCollection(client) {
     const database = client.db('training');
-    const collection = database.collection('zips');
+    const collection = database.collection('countries');
     var result = await collection.drop();
     console.log(result);
+    client.close();
+};
+
+async function transaction (client) {
+    const session = client.startSession();
+    const transOptions = {readPreference: 'primary', readConcern: {level: 'local'}, writeConcern: {w: 'majority'}};
+    var result = await session.withTransaction (
+        async () =>{
+            const col1 = client.db ('training').collection ('countries');
+            const col2 = client.db ('pragati').collection ('languages');
+            await col1.insertOne ({a: 1}, {session});
+            await col2.insertOne ({b: 2}, {session});
+        }, transOptions
+    );
+    await session.endSession();
+    console.log ("so far so good");
     client.close();
 };
 
