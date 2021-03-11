@@ -14,11 +14,7 @@ function dbConnect() {
     // callback = deleteJennyHJones;
     // callback = deleteAllMen;
     // callback = updateNancyKarin;
-    // callback = updateMany;
-    // callback = replaceOne;
-    // callback = aggregation;
-    // callback = countPersons;
-    callback = distinctGenderValues;
+    callback = updateMany;
     // callback = dropCollection;
 
 
@@ -67,7 +63,7 @@ function findOne(err, db) {
 function findAll(err, db) {
     if (err) throw err;
     var dbo = db.db('training');
-    dbo.collection('persons').find({}).toArray(function (err, result) {
+    dbo.collection('persons').find({}).toArray(function (err, result) { 
         if (err) throw err;
         // console.log(result);
         // var myJSON = result;
@@ -75,18 +71,18 @@ function findAll(err, db) {
         // console.log("first element = "+myJSON[0]);
         // console.log("name key in first element = "+myJSON[0]["name"]);
         // result.forEach(console.log);
-        console.log(result.length);
-        console.log(result[0]['name']['first']);
+        console.log (result.length);
+        console.log (result[0]['name']['first']);
         db.close();
     });
 };
 
-function findAll2(err, db) {
+function findAll2 (err, db) {
     if (err) throw err;
-    var dbo = db.db('training');
-    dbo.collection('persons').find({}, function (err, result) {
+    var dbo = db.db ('training');
+    dbo.collection ('persons').find({}, function (err, result) {
         if (err) throw err;
-        result.forEach(console.dir);
+        result.forEach (console.dir);
         db.close();
     });
 };
@@ -133,20 +129,20 @@ function findAllWithProjectionAndSort(err, db) {
     //     db.close();
     // });
     // Alternatively...
-    dbo.collection('persons').find({}, { projection: projection }).sort(byLastNameAndFirstName).skip(3).limit(3).
-        toArray(function (err, result) {
-            if (err) throw err;
-            console.log(result);
-            db.close();
-        });
+    dbo.collection('persons').find({}, { projection: projection}).sort (byLastNameAndFirstName).skip(3).limit(3).
+    toArray(function (err, result) {
+        if (err) throw err;
+        console.log(result);
+        db.close();
+    });
 
 };
 
-function findWithVariousOptions(err, db) {
+function findWithVariousOptions (err, db) {
     if (err) throw err;
-    var dbo = db.db('training');
-    var query = { gender: 'F' };
-    var projection = { name: 1, gender: 1, yearOfBirth: 1, _id: 0 };
+    var dbo = db.db ('training');
+    var query = {gender: 'F'};
+    var projection = {name: 1, gender: 1, yearOfBirth: 1, _id: 0};
     var limit = 3;
     var skip = 3;
     // dbo.collection ('persons').find({}, {projection: projection, limit: limit, skip: skip}, function (err, result) {
@@ -154,9 +150,9 @@ function findWithVariousOptions(err, db) {
     //     result.forEach (console.dir);
     //     db.close();
     // });
-    dbo.collection('persons').find({}, { batchsize: 2 }, function (err, result) {
+    dbo.collection ('persons').find({}, {batchsize: 2}, function (err, result) {
         if (err) throw err;
-        result.forEach(console.dir);
+        result.forEach (console.dir);
         db.close();
     });
 };
@@ -183,86 +179,26 @@ function deleteAllMen(err, db) {
     });
 };
 
-function updateNancyKarin(err, db) {
+function updateNancyKarin (err, db) {
     if (err) throw err;
-    var dbo = db.db('training');
-    var query = { 'name.first': 'Nancy', 'name.last': 'Karin' };
-    var newValues = { $set: { passport: 'H123321', yearOfBirth: 1950 } };
-    dbo.collection('persons').updateOne(query, newValues, function (err, result) {
+    var dbo = db.db ('training');
+    var query = {'name.first': 'Nancy', 'name.last': 'Karin'};
+    var newValues = {$set: {passport: 'H123321', yearOfBirth: 1950}};
+    dbo.collection ('persons').updateOne (query, newValues, function (err, result) {
         if (err) throw err;
-        console.log(result.result.n);
+        console.log (result.result.n);
         db.close();
     });
 };
 
-function updateMany(err, db) {
+function updateMany (err, db) {
     if (err) throw err;
-    var dbo = db.db('training');
-    var query = { gender: 'M' };
-    var newValues = { $set: { isMale: true } };
-    dbo.collection('persons').updateMany(query, newValues, function (err, result) {
+    var dbo = db.db ('training');
+    var query = {gender: 'M'};
+    var newValues = {$set: {isMale: true}};
+    dbo.collection ('persons').updateMany (query, newValues, function (err, result) {
         if (err) throw err;
-        console.log(result.result.n);
-        db.close();
-    });
-};
-
-function replaceOne(err, db) {
-    if (err) throw err;
-    var dbo = db.db('training');
-    var query = { 'name.first': 'Nancy', 'name.last': 'Karin' };
-    var newDocument = {
-        name: { first: 'Nancy', last: 'Karin' },
-        gender: 'O',
-        yearOfBirth: 1962,
-        livesIn: 'Montreal',
-        countriesVisited: ['Canada', 'United States of America'],
-        languages: [
-            { name: 'English', proficiency: 'Fluent' },
-            { name: 'French', proficiency: 'Fluent' },
-            { name: 'German', proficiency: 'Intermediate' },
-            { name: 'Greek', proficiency: 'Intermediate' },
-            { name: 'Latin', proficiency: 'Intermediate' },
-            { name: 'Sanskrit', proficiency: 'Beginner' }]
-    };
-    dbo.collection('persons').replaceOne(query, newDocument, function (err, result) {
-        if (err) throw err;
-        console.log(result.result.nModified);
-        db.close();
-    });
-};
-
-function aggregation(err, db) {
-    if (err) throw err;
-    var dbo = db.db('training');
-    var aggregation = [
-        { $group: { _id: '$state', population: { $sum: '$pop' } } },
-        { $match: { population: { $gte: 10 * 1000 * 1000 } } },
-        { $sort: { _id: 1 } }
-    ];
-    dbo.collection('zips').aggregate(aggregation, function (err, result) {
-        if (err) throw err;
-        result.forEach(console.dir);
-        db.close();
-    });
-};
-
-function countPersons(err, db) {
-    if (err) throw err;
-    dbo = db.db('training');
-    dbo.collection('persons').countDocuments(function (err, result) {
-        if (err) throw err;
-        console.log(result);
-        db.close();
-    });
-};
-
-function distinctGenderValues(err, db) {
-    if (err) throw err;
-    var dbo = db.db('training');
-    dbo.collection('persons').distinct('gender', function (err, result) {
-        if (err) throw err;
-        console.log(result);
+        console.log (result.result.n);
         db.close();
     });
 };
